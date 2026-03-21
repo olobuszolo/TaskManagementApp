@@ -13,12 +13,12 @@ class Categories(models.Model):
 
 class Events(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     scheduled_for = models.DateTimeField()
     creator_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_events')
     category_id = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True, related_name='events')
-    status = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, null=True, blank=True)
     group_id = models.IntegerField(null=True, blank=True)
 
 class EventParticipants(models.Model):
