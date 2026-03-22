@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { event } from "../../types";
+import { Category, Event } from "../../types";
 import { createEvent, fetchEvents, deleteEvent } from "../services/events";
 import CalendarViewModel from "./components/CalendarView"; 
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
 import DayEventsModal from "./components/DayEventsModal";
 import EventDetailsModal from "./components/EventDetailsModal";
 import AddEventModal from "./components/AddEventModal";
+import { fetchCategories } from "../services/categories";
 
 export default function UserPage() {
-	const [events, setEvents] = useState<event[]>([]);
+	const [events, setEvents] = useState<Event[]>([]);
+	const [categories, setCategories] = useState<Category[]>([]);
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [addEventModal, setAddEventModal] = useState(false);
@@ -18,9 +20,10 @@ export default function UserPage() {
 		title: "",
 		description: "",
 		scheduled_for: selectedDate,
+		category_id: null,
 	})
 	const [isEventModalOpen, setIsEventModalOpen] = useState(false);
-	const [selectedEvent, setSelectedEvent] = useState<event | null>(null);
+	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
 	useEffect(() => {
@@ -33,7 +36,18 @@ export default function UserPage() {
 			}
 		};
 
+		const loadCategories = async () => {
+			try {
+				const data = await fetchCategories();
+				setCategories(data);
+			}
+			catch (err) {
+				console.error(err);
+			}
+		}
+
 		loadEvents();
+		loadCategories();
 	}, []);
 
 	const selectedDayEvents = useMemo(() => {
@@ -47,7 +61,7 @@ export default function UserPage() {
 		const { name, value } = e.target;
 		setNewEvent((prev) => ({
 			...prev,
-			[name]: value
+			[name]: name === "category_id" ? (value ? parseInt(value) : null) : value,
 		}))
 	}
 
@@ -77,11 +91,11 @@ export default function UserPage() {
 			setEvents(data);
 
 			setAddEventModal(false);
-			setAddEventModal(false);
 			setNewEvent({
 				title: "",
 				description: "",
 				scheduled_for: "",
+				category_id: null,
 			});
 		} catch (error) {
 			console.error("Error adding event:", error);
@@ -136,6 +150,7 @@ export default function UserPage() {
 				{addEventModal && (
 					<AddEventModal
 						newEvent={newEvent}
+						categories={categories}
 						onChange={handleChangeNewEvent}
 						onClose={() => {
 							setAddEventModal(false);
@@ -143,6 +158,7 @@ export default function UserPage() {
 								title: "",
 								description: "",
 								scheduled_for: "",
+								category_id: null,
 							});
 						}}
 						onSubmit={handleAddEvent}
@@ -152,6 +168,7 @@ export default function UserPage() {
 				{isEventModalOpen && selectedEvent &&  (
 					<EventDetailsModal
 						event={selectedEvent}
+						categories={categories}
 						onClose={() => {
 							setIsEventModalOpen(false);
 							setSelectedEvent(null);

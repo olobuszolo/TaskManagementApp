@@ -21,9 +21,6 @@ class EventListCreateView(generics.ListCreateAPIView):
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
 
-    # def get_queryset(self):
-    #     return Events.objects.filter(creator_id=self.request.user | Events.participants.filter(user_id=self.request.user))
-
     def get_queryset(self):
         user = self.request.user
         return Events.objects.filter(participants__user_id=user).distinct()

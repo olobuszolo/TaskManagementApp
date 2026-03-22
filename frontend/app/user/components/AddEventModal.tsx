@@ -1,7 +1,7 @@
 import { AddEventModalProps } from "@/types";
 import Modal from "./Modal";
 
-export default function AddEventModal({ newEvent, onChange, onClose, onSubmit }: AddEventModalProps) {
+export default function AddEventModal({ newEvent, categories, onChange, onClose, onSubmit }: AddEventModalProps) {
     return (
         <Modal onClose={onClose}>
             <div className="relative mb-5">
@@ -59,12 +59,35 @@ export default function AddEventModal({ newEvent, onChange, onClose, onSubmit }:
                 />
                 </div>
 
+                <div className="flex flex-col gap-1">
+                    <label
+                        htmlFor="category_id"
+                        className="text-sm font-medium text-slate-700"
+                    >
+                        Category
+                    </label>
+                    <select
+                        id="category_id"
+                        name="category_id"
+                        value={newEvent.category_id}
+                        onChange={onChange}
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                    >
+                        <option value={null}>Select a category</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 <button
-                type="button"
-                className="mt-2 w-full rounded-lg bg-slate-800 px-4 py-2 font-medium text-white transition hover:bg-slate-700"
-                onClick={onSubmit}
+                    type="button"
+                    className="mt-2 w-full rounded-lg bg-slate-800 px-4 py-2 font-medium text-white transition hover:bg-slate-700"
+                    onClick={onSubmit}
                 >
-                Add Event
+                    Add Event
                 </button>
             </div>
 

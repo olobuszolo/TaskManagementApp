@@ -1,13 +1,14 @@
+import Link from "next/link";
 import Modal from "./Modal";
 import { EventDetailsModalProps } from "@/types";
 
-export default function EventDetailsModal({event, onClose, onDelete}: EventDetailsModalProps) {
+export default function EventDetailsModal({event, categories, onClose, onDelete}: EventDetailsModalProps) {
     return (
         <Modal onClose={onClose}>
             <div className="relative mb-4">
-                <h2 className="text-xl font-semibold text-slate-800 text-center">
+                <Link href={`/user/event/${event.id}`} className="text-xl font-semibold text-slate-800 text-center">
                     {event.title}
-                </h2>
+                </Link>
             </div>
 
             <p className="text-xs text-slate-500 font-semibold uppercase">
@@ -26,7 +27,7 @@ export default function EventDetailsModal({event, onClose, onDelete}: EventDetai
                 Category
             </p>
             <p className="text-slate-700 mb-2">
-                {event.category_id || "No category provided."}
+                {event.category_id ? categories.find(c => c.id === event.category_id)?.name : "No category provided."}
             </p>
             <p className="text-xs text-slate-500 font-semibold uppercase">
                 Status
