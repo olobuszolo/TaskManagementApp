@@ -60,3 +60,18 @@ export type EventDetailsModalProps = {
     onClose: () => void;
     onDelete: () => void;
 }
+
+export type EditEventProps = {
+    formData: NewEventType;
+    categories: Category[];
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    onSubmit: () => void;
+    submitLabel: string;
+}
+
+export type UpdateEventData = {
+    title: string, 
+    description: string,
+    scheduled_for: string
+    category_id: number | null;
+}
