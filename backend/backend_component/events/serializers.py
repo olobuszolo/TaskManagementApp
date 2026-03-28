@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Categories, Events, EventParticipants
+from .models import Categories, Events, EventParticipants, Status
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,12 +8,16 @@ class CategorySerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'owner_id': {'read_only': True}
         }
-            
+
+class StatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Status
+        fields = ['id', 'code', 'name', 'color']
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Events
-        fields = ['id', 'title', 'description', 'created_at', 'scheduled_for', 'creator_id', 'category_id', 'status', 'group_id']
+        fields = ['id', 'title', 'description', 'created_at', 'scheduled_for', 'creator_id', 'category_id', 'status_id', 'group_id']
         extra_kwargs = {
             'creator_id': {'read_only': True}
         }
