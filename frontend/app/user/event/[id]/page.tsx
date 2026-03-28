@@ -9,7 +9,7 @@ import { Category, UpdateEventData } from "@/types";
 export default function EditEventPage() {
     const params = useParams();
     const router = useRouter();
-    const eventId = parseInt(params.id, 10);
+    const eventId = parseInt(params.id as string, 10);
 
     const [categories, setCategories] = useState<Category[]>([]);
     const [formData, setFormData] = useState<UpdateEventData>({
@@ -32,7 +32,9 @@ export default function EditEventPage() {
                 setFormData({
                     title: event.title,
                     description: event.description ?? "",
-                    scheduled_for: event.scheduled_for,
+                    scheduled_for: event.scheduled_for
+                        ? new Date(event.scheduled_for).toISOString().slice(0, 16)
+                        : "",
                     category_id: event.category_id ?? null,
                 });
             } catch (error) {
@@ -181,7 +183,7 @@ export default function EditEventPage() {
                         <button
                             type="button"
                             onClick={() => router.push("/user")}
-                            className="px-5 py-3 text-slate-300 transition hover:text-white"
+                            className="px-5 py-3 font-semibold text-white transition hover:text-slate-300 disabled:opacity-60"
                         >
                             Cancel
                         </button>
@@ -191,7 +193,7 @@ export default function EditEventPage() {
                             disabled={saving}
                             className="px-5 py-3 font-semibold text-white transition hover:text-slate-300 disabled:opacity-60"
                         >
-                            {saving ? "Saving..." : "Save changes"}
+                            Save changes
                         </button>
                     </div>
                 </form>
