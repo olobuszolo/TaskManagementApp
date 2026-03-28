@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Category, Event } from "../../types";
+import { Category, Event, Status } from "../../types";
 import { createEvent, fetchEvents, deleteEvent } from "../services/events";
 import CalendarViewModel from "./components/CalendarView"; 
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
@@ -9,10 +9,12 @@ import DayEventsModal from "./components/DayEventsModal";
 import EventDetailsModal from "./components/EventDetailsModal";
 import AddEventModal from "./components/AddEventModal";
 import { fetchCategories } from "../services/categories";
+import { fetchStatuses } from "../services/statuses";
 
 export default function UserPage() {
 	const [events, setEvents] = useState<Event[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
+	const [statuses, setStatuses] = useState<Status[]>([]);
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [addEventModal, setAddEventModal] = useState(false);
@@ -21,6 +23,7 @@ export default function UserPage() {
 		description: "",
 		scheduled_for: selectedDate,
 		category_id: null,
+		status_id: null,
 	})
 	const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -46,8 +49,19 @@ export default function UserPage() {
 			}
 		}
 
+		const loadStatuses = async () => {
+			try {
+				const data = await fetchStatuses();
+				setStatuses(data);
+			}
+			catch (err) {
+				console.error(err);
+			}
+		}
+
 		loadEvents();
 		loadCategories();
+		loadStatuses();
 	}, []);
 
 	const selectedDayEvents = useMemo(() => {
@@ -96,6 +110,7 @@ export default function UserPage() {
 				description: "",
 				scheduled_for: "",
 				category_id: null,
+				status_id: null,
 			});
 		} catch (error) {
 			console.error("Error adding event:", error);
@@ -137,7 +152,6 @@ export default function UserPage() {
 						selectedDate={selectedDate}
 						events={selectedDayEvents}
 						onClose={() => {
-							console.log("zamykam glowny modal")
 							setIsModalOpen(false)}}
 						onAddEvent={() => setAddEventModal(true)}
 						onSelectedEvent={(event) => {
@@ -159,6 +173,7 @@ export default function UserPage() {
 								description: "",
 								scheduled_for: "",
 								category_id: null,
+								status_id: null,
 							});
 						}}
 						onSubmit={handleAddEvent}
@@ -169,6 +184,7 @@ export default function UserPage() {
 					<EventDetailsModal
 						event={selectedEvent}
 						categories={categories}
+						statuses={statuses}
 						onClose={() => {
 							setIsEventModalOpen(false);
 							setSelectedEvent(null);
