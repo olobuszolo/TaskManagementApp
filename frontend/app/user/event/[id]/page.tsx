@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchEventById, updateEvent } from "@/app/services/events";
 import { fetchCategories } from "@/app/services/categories";
-import { Category, UpdateEventData } from "@/types";
+import { Category, Status, UpdateEventData } from "@/types";
+import { fetchStatuses } from "@/app/services/statuses";
 
 export default function EditEventPage() {
     const params = useParams();
@@ -12,23 +13,27 @@ export default function EditEventPage() {
     const eventId = parseInt(params.id as string, 10);
 
     const [categories, setCategories] = useState<Category[]>([]);
+    const [statuses, setStatuses] = useState<Status[]>([]);
     const [formData, setFormData] = useState<UpdateEventData>({
         title: "",
         description: "",
         scheduled_for: "",
         category_id: null,
+        status_id: null,
     });
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
             try {
-                const [event, categoriesData] = await Promise.all([
+                const [event, categoriesData, statusesData] = await Promise.all([
                     fetchEventById(eventId),
                     fetchCategories(),
+                    fetchStatuses(),
                 ]);
 
                 setCategories(categoriesData);
+                setStatuses(statusesData);
                 setFormData({
                     title: event.title,
                     description: event.description ?? "",
@@ -36,6 +41,7 @@ export default function EditEventPage() {
                         ? new Date(event.scheduled_for).toISOString().slice(0, 16)
                         : "",
                     category_id: event.category_id ?? null,
+                    status_id: event.status_id ?? 1,
                 });
             } catch (error) {
                 console.error("Failed to load event data:", error);
@@ -129,29 +135,34 @@ export default function EditEventPage() {
 
                     <section className="space-y-6">
                         <div>
-                            <h2 className="text-xl font-semibold text-white">Schedule and category</h2>
+                            <h2 className="text-xl font-semibold text-white">Date, status and category</h2>
                             <p className="mt-1 text-sm text-slate-400">
-                                Set when the event takes place and assign a category.
+                                Set when the event takes place and assign a status and a category.
                             </p>
                         </div>
 
                         <div className="grid gap-6 md:grid-cols-2">
                             <div className="grid gap-2">
                                 <label
-                                    htmlFor="scheduled_for"
+                                    htmlFor="status_id"
                                     className="text-sm font-medium text-slate-200"
                                 >
-                                    Date
+                                    Status
                                 </label>
-                                <input
-                                    id="scheduled_for"
-                                    type="datetime-local"
-                                    name="scheduled_for"
-                                    value={formData.scheduled_for}
+                                <select
+                                    id="status_id"
+                                    name="status_id"
+                                    value={formData.status_id ?? ""}
                                     onChange={handleChange}
-                                    className="w-full border-b border-slate-600 bg-transparent px-0 py-3 text-white outline-none transition focus:border-white"
-                                    required
-                                />
+                                    className="w-full border-b border-slate-600 bg-slate-900 px-0 py-3 text-white outline-none transition focus:border-white"
+                                >
+                                    <option value="">Select a status</option>
+                                    {statuses.map((status) => (
+                                        <option key={status.id} value={status.id}>
+                                            {status.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="grid gap-2">
@@ -176,6 +187,23 @@ export default function EditEventPage() {
                                     ))}
                                 </select>
                             </div>
+                                                    <div className="grid gap-2">
+                            <label
+                                htmlFor="scheduled_for"
+                                className="text-sm font-medium text-slate-200"
+                            >
+                                Date
+                            </label>
+                            <input
+                                id="scheduled_for"
+                                type="datetime-local"
+                                name="scheduled_for"
+                                value={formData.scheduled_for}
+                                onChange={handleChange}
+                                className="w-full border-b border-slate-600 bg-transparent px-0 py-3 text-white outline-none transition focus:border-white"
+                                required
+                            />
+                        </div>
                         </div>
                     </section>
 

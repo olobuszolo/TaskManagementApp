@@ -6,13 +6,20 @@ export type Event = {
     scheduled_for: string;
     creator_id: number;
     category_id: number | null;
-    status: string;
+    status_id: number | null;
     group_id: number | null;
 }
 
 export type Category = {
     id: number;
     name: string;
+}
+
+export type Status = {
+    id: number;
+    code: string;
+    name: string;
+    color: string;
 }
 
 export type ModalProps = PropsWithChildren<{
@@ -44,6 +51,7 @@ type NewEventType = {
     description: string;
     scheduled_for: string | null;
     category_id: number | null;
+    status_id: number | null;
 }
 
 export type AddEventModalProps = {
@@ -57,6 +65,7 @@ export type AddEventModalProps = {
 export type EventDetailsModalProps = {
     event: Event;
     categories: Category[];
+    statuses: Status[];
     onClose: () => void;
     onDelete: () => void;
 }
@@ -74,4 +83,5 @@ export type UpdateEventData = {
     description: string,
     scheduled_for: string
     category_id: number | null;
+    status_id: number | null;
 }

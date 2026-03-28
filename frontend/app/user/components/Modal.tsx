@@ -10,7 +10,6 @@ export default function Modal({ children, onClose, className }: ModalProps) {
                     <button
                         type="button"
                         onClick={() => {
-                            console.log("klik close");
                             onClose();
                         }}
                         className="absolute top-3 right-3 z-10 px-3 py-1 text-slate-500 bg-slate-100 rounded-lg hover:bg-slate-200 hover:text-slate-700 transition"

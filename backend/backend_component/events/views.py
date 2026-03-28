@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from .serializers import CategorySerializer, EventSerializer, EventParticipantSerializer
+from .serializers import CategorySerializer, EventSerializer, EventParticipantSerializer, StatusSerializer
 from rest_framework import generics
-from .models import Categories, Events, EventParticipants
+from .models import Categories, Events, EventParticipants, Status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Q
 # Create your views here.
@@ -15,6 +15,11 @@ class CategoryListCreateView(generics.ListCreateAPIView):
     
     def perform_create(self, serializer):
         serializer.save(owner_id=self.request.user)
+
+class StatusListView(generics.ListAPIView):
+    queryset = Status.objects.all()
+    serializer_class = StatusSerializer
+    permission_classes = [IsAuthenticated]
 
 class EventListCreateView(generics.ListCreateAPIView):
     queryset = Events.objects.all()

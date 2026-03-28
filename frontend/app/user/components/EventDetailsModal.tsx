@@ -2,7 +2,7 @@ import Link from "next/link";
 import Modal from "./Modal";
 import { EventDetailsModalProps } from "@/types";
 
-export default function EventDetailsModal({event, categories, onClose, onDelete}: EventDetailsModalProps) {
+export default function EventDetailsModal({event, categories, statuses, onClose, onDelete}: EventDetailsModalProps) {
     return (
         <Modal onClose={onClose}>
             <div className="relative mb-4">
@@ -33,7 +33,7 @@ export default function EventDetailsModal({event, categories, onClose, onDelete}
                 Status
             </p>
             <p className="text-slate-700 mb-2">
-                {event.status || "No status provided."}
+                {event.status_id ? statuses.find(s => s.id === event.status_id)?.name : "No status provided."}
             </p>
 
             <button
