@@ -1,0 +1,19 @@
+# Python cache and local env files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+# Django / backend generated files
+backend/backend_component/*/migrations/[0-9]*.py
+backend/backend_component/*/migrations/*.pyc
+db.sqlite3
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

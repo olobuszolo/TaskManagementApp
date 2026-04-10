@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 class Categories(models.Model):
     owner_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='categories')
     name = models.CharField(max_length=255)
+    color = models.CharField(max_length=7, default='#2563eb')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

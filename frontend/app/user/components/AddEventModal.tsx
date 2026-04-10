@@ -69,11 +69,11 @@ export default function AddEventModal({ newEvent, categories, onChange, onClose,
                     <select
                         id="category_id"
                         name="category_id"
-                        value={newEvent.category_id}
+                        value={newEvent.category_id ?? ""}
                         onChange={onChange}
                         className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                     >
-                        <option value={null}>Select a category</option>
+                        <option value="">Select a category</option>
                         {categories.map((category) => (
                             <option key={category.id} value={category.id}>
                                 {category.name}

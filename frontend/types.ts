@@ -13,6 +13,7 @@ export type Event = {
 export type Category = {
     id: number;
     name: string;
+    color: string;
 }
 
 export type Status = {
@@ -22,6 +23,12 @@ export type Status = {
     color: string;
 }
 
+export type UserInfo = {
+    id: number;
+    username: string;
+    email: string;
+}
+
 export type ModalProps = PropsWithChildren<{
 	onClose?: () => void;
 	className?: string;
@@ -29,7 +36,21 @@ export type ModalProps = PropsWithChildren<{
 
 export type CalendarViewProps = {
     events: Event[];
+    categories: Category[];
     onDateClick: (dateStr: string) => void;
+    onMonthChange: (year: number, month: number) => void;
+}
+
+export type EventFiltersPanelProps = {
+    categories: Category[];
+    statuses: Status[];
+    selectedCategoryId: number | "all";
+    selectedStatusId: number | "all";
+    filteredEventsCount: number;
+    totalEventsCount: number;
+    onCategoryChange: (value: number | "all") => void;
+    onStatusChange: (value: number | "all") => void;
+    onClearFilters: () => void;
 }
 
 export type ConfirmDeleteModalProps = {
@@ -57,7 +78,7 @@ type NewEventType = {
 export type AddEventModalProps = {
     newEvent: NewEventType;
     categories: Category[];
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
     onClose: () => void;
     onSubmit: () => void;
 }
@@ -73,7 +94,7 @@ export type EventDetailsModalProps = {
 export type EditEventProps = {
     formData: NewEventType;
     categories: Category[];
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
     onSubmit: () => void;
     submitLabel: string;
 }
@@ -84,4 +105,13 @@ export type UpdateEventData = {
     scheduled_for: string
     category_id: number | null;
     status_id: number | null;
+}
+
+export type CreateCategoryPayload = {
+    name: string;
+    color: string;
+}
+
+export type UpdateCategoryPayload = {
+    color: string;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { Category, Event, Status } from "../../types";
 import { createEvent, fetchEvents, deleteEvent } from "../services/events";
@@ -8,13 +9,25 @@ import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
 import DayEventsModal from "./components/DayEventsModal";
 import EventDetailsModal from "./components/EventDetailsModal";
 import AddEventModal from "./components/AddEventModal";
+import EventFiltersPanel from "./components/EventFiltersPanel";
 import { fetchCategories } from "../services/categories";
 import { fetchStatuses } from "../services/statuses";
+
+const getCurrentVisibleMonth = () => {
+	const now = new Date();
+	return {
+		year: now.getUTCFullYear(),
+		month: now.getUTCMonth() + 1, // JS months are 0-indexed
+	};
+};
 
 export default function UserPage() {
 	const [events, setEvents] = useState<Event[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [statuses, setStatuses] = useState<Status[]>([]);
+	const [visibleMonth, setVisibleMonth] = useState(getCurrentVisibleMonth);
+	const [selectedCategoryId, setSelectedCategoryId] = useState<number | "all">("all");
+	const [selectedStatusId, setSelectedStatusId] = useState<number | "all">("all");
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [addEventModal, setAddEventModal] = useState(false);
@@ -30,15 +43,6 @@ export default function UserPage() {
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
 	useEffect(() => {
-		const loadEvents = async () => {
-			try {
-				const data = await fetchEvents();
-				setEvents(data);
-			} catch (err) {
-				console.error(err);
-			}
-		};
-
 		const loadCategories = async () => {
 			try {
 				const data = await fetchCategories();
@@ -59,23 +63,46 @@ export default function UserPage() {
 			}
 		}
 
-		loadEvents();
 		loadCategories();
 		loadStatuses();
 	}, []);
 
+	useEffect(() => {
+		const loadEvents = async () => {
+			try {
+				const data = await fetchEvents(visibleMonth.year, visibleMonth.month);
+				setEvents(data);
+			} catch (err) {
+				console.error(err);
+			}
+		};
+
+		loadEvents();
+	}, [visibleMonth]);
+
+	const filteredEvents = useMemo(() => {
+		return events.filter((event) => {
+			const matchesCategory =
+				selectedCategoryId === "all" || event.category_id === selectedCategoryId;
+			const matchesStatus =
+				selectedStatusId === "all" || event.status_id === selectedStatusId;
+
+			return matchesCategory && matchesStatus;
+		});
+	}, [events, selectedCategoryId, selectedStatusId]);
+
 	const selectedDayEvents = useMemo(() => {
 		if (!selectedDate) return [];
-		return events.filter(event => {
+		return filteredEvents.filter(event => {
 			return event.scheduled_for.slice(0, 10) === selectedDate
 		})
-	}, [events, selectedDate]);
+	}, [filteredEvents, selectedDate]);
 
-	const handleChangeNewEvent = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+	const handleChangeNewEvent = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
 		const { name, value } = e.target;
 		setNewEvent((prev) => ({
 			...prev,
-			[name]: name === "category_id" ? (value ? parseInt(value) : null) : value,
+			[name]: name === "category_id" || name === "status_id" ? (value ? parseInt(value) : null) : value,
 		}))
 	}
 
@@ -101,7 +128,7 @@ export default function UserPage() {
 		try {
 			await createEvent(newEvent);
 
-			const data = await fetchEvents();
+			const data = await fetchEvents(visibleMonth.year, visibleMonth.month);
 			setEvents(data);
 
 			setAddEventModal(false);
@@ -120,7 +147,7 @@ export default function UserPage() {
 	const handleDeleteEvent = async (id: number) => {
 		try {
 			await deleteEvent(id);
-			const data = await fetchEvents();
+			const data = await fetchEvents(visibleMonth.year, visibleMonth.month);
 			setEvents(data);
 			setDeleteModalOpen(false);
 			setIsEventModalOpen(false);
@@ -142,9 +169,42 @@ export default function UserPage() {
 	return (
 		<div className="min-h-screen bg-slate-900 text-white">
 			<div className="relative max-w-4xl mx-auto p-4">
+				<div className="mb-4 flex justify-end">
+					<Link
+						href="/user/info"
+						className="inline-flex items-center justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
+					>
+						User info
+					</Link>
+				</div>
+
+				<EventFiltersPanel
+					categories={categories}
+					statuses={statuses}
+					selectedCategoryId={selectedCategoryId}
+					selectedStatusId={selectedStatusId}
+					filteredEventsCount={filteredEvents.length}
+					totalEventsCount={events.length}
+					onCategoryChange={setSelectedCategoryId}
+					onStatusChange={setSelectedStatusId}
+					onClearFilters={() => {
+						setSelectedCategoryId("all");
+						setSelectedStatusId("all");
+					}}
+				/>
+
 				<CalendarViewModel 
-					events={events}
+					events={filteredEvents}
+					categories={categories}
 					onDateClick={handleDateClick}
+					onMonthChange={(year, month) => {
+						setVisibleMonth((current) => {
+							if (current.year === year && current.month === month) {
+								return current;
+							}
+							return { year, month };
+						});
+					}}
 				/>
 
 				{isModalOpen && selectedDate && (

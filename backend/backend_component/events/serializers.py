@@ -4,7 +4,7 @@ from .models import Categories, Events, EventParticipants, Status
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Categories
-        fields = ['id', 'owner_id', 'name', 'created_at']
+        fields = ['id', 'owner_id', 'name', 'color', 'created_at']
         extra_kwargs = {
             'owner_id': {'read_only': True}
         }
