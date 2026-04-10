@@ -13,10 +13,14 @@ export const createEvent = async (data: Event) => {
 	return res.data;
 }
 
-export const fetchEvents = async () => {
+export const fetchEvents = async (year?: number, month?: number) => {
     const res = await axios.get(
         "http://localhost:8000/events/",
         {
+            params: {
+                year,
+                month,
+            },
             withCredentials: true,
         }
     );

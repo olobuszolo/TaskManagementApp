@@ -1,10 +1,9 @@
-from django.shortcuts import render
 from .serializers import CategorySerializer, EventSerializer, EventParticipantSerializer, StatusSerializer
 from rest_framework import generics
 from .models import Categories, Events, EventParticipants, Status
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.db.models import Q
-# Create your views here.
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
+from django.utils import timezone
 
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Categories.objects.all()
@@ -15,6 +14,14 @@ class CategoryListCreateView(generics.ListCreateAPIView):
     
     def perform_create(self, serializer):
         serializer.save(owner_id=self.request.user)
+
+class CategoryDetailView(generics.RetrieveUpdateAPIView):
+    queryset = Categories.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Categories.objects.filter(owner_id=self.request.user)
 
 class StatusListView(generics.ListAPIView):
     queryset = Status.objects.all()
@@ -28,7 +35,29 @@ class EventListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Events.objects.filter(participants__user_id=user).distinct()
+        today = timezone.localdate()
+        year_param = self.request.query_params.get("year")
+        month_param = self.request.query_params.get("month")
+
+        try:
+            year = int(year_param) if year_param is not None else today.year
+            month = int(month_param) if month_param is not None else today.month
+        except (TypeError, ValueError):
+            raise ValidationError("Query params 'year' and 'month' must be integers.")
+
+        if month < 1 or month > 12:
+            raise ValidationError("Query param 'month' must be between 1 and 12.")
+
+        return (
+            Events.objects
+            .filter(
+                participants__user_id=user,
+                scheduled_for__year=year,
+                scheduled_for__month=month,
+            )
+            .distinct()
+            .order_by("scheduled_for")
+        )
     
     def perform_create(self, serializer):
         event = serializer.save(creator_id=self.request.user)
