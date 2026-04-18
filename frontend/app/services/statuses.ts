@@ -1,12 +1,7 @@
-import axios from "axios";
+import { api } from "@/utils/api";
 
 export const fetchStatuses = async () => {
-    const res = await axios.get(
-        "http://localhost:8000/events/statuses/",
-        {
-			withCredentials: true,
-		}
-	);
+    const res = await api.get("/events/statuses/");
 
 	return res.data;
 }

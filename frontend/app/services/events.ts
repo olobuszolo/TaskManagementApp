@@ -1,27 +1,20 @@
-import axios from "axios";
 import { Event, UpdateEventData } from "../../types";
+import { api } from "@/utils/api";
 
 export const createEvent = async (data: Event) => {
-	const res = await axios.post(
-		"http://localhost:8000/events/",
-		data,
-		{
-			withCredentials: true,
-		}
-	);
+	const res = await api.post("/events/", data);
 
 	return res.data;
 }
 
 export const fetchEvents = async (year?: number, month?: number) => {
-    const res = await axios.get(
-        "http://localhost:8000/events/",
+    const res = await api.get(
+        "/events/",
         {
             params: {
                 year,
                 month,
             },
-            withCredentials: true,
         }
     );
 
@@ -29,35 +22,19 @@ export const fetchEvents = async (year?: number, month?: number) => {
 }
 
 export const deleteEvent = async (id: number) => {
-	const res = await axios.delete(
-		`http://localhost:8000/events/${id}/`,
-		{
-			withCredentials: true,
-		}
-	);
+	const res = await api.delete(`/events/${id}/`);
 
 	return res.data;
 }
 
 export const fetchEventById = async (id: number) => {
-	const res = await axios.get(
-		`http://localhost:8000/events/${id}/`,
-		{
-			withCredentials: true,
-		}
-	);
+	const res = await api.get(`/events/${id}/`);
 
 	return res.data;
 }
 
 export const updateEvent = async (id: number, data: UpdateEventData) => {
-	const res = await axios.patch(
-		`http://localhost:8000/events/${id}/`,
-		data,
-		{
-			withCredentials: true,
-		}
-	);
+	const res = await api.patch(`/events/${id}/`, data);
 
 	return res.data;
 

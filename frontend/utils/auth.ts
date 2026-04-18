@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const API_URL = 'http://localhost:8000';
+import { api } from "./api";
 
 const extractErrorMessage = (error: unknown, fallbackMessage: string) => {
     if (axios.isAxiosError(error)) {
@@ -28,10 +27,10 @@ const extractErrorMessage = (error: unknown, fallbackMessage: string) => {
 
 export const loginUser = async (username: string, password: string) => {
     try {
-        const response = await axios.post(`${API_URL}/login/login/`, {
+        const response = await api.post(`/login/login/`, {
             username,
             password
-        }, {withCredentials: true});
+        });
         return response.data;
     } catch (error) {
         throw new Error(extractErrorMessage(error, 'Login failed'));
@@ -40,7 +39,7 @@ export const loginUser = async (username: string, password: string) => {
 
 export const registerUser = async (username: string, email: string, password: string) => {
     try {
-        const response = await axios.post(`${API_URL}/login/user/register/`, {
+        const response = await api.post(`/login/user/register/`, {
             username,
             email,
             password
@@ -53,7 +52,7 @@ export const registerUser = async (username: string, email: string, password: st
 
 export const logoutUser = async () => {
     try {
-        const response = await axios.post(`${API_URL}/login/logout/`, {}, {withCredentials: true});
+        const response = await api.post(`/login/logout/`);
         return response.data;
     } catch {
         throw new Error('Logout failed');
@@ -62,7 +61,7 @@ export const logoutUser = async () => {
 
 export const getUserInfo = async () => {
     try {
-        const response = await axios.get(`${API_URL}/login/user-info/`, {withCredentials: true});
+        const response = await api.get(`/login/user-info/`);
         return response.data;
     } catch {
         throw new Error('Failed to get user info');
@@ -71,7 +70,7 @@ export const getUserInfo = async () => {
 
 export const refreshToken = async () => {
     try {
-        const response = await axios.post(`${API_URL}/login/refresh/`, {}, {withCredentials: true});
+        const response = await api.post(`/login/token/refresh/`);
         return response.data;
     } catch {
         throw new Error('Failed to refresh token');

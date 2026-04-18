@@ -1,37 +1,20 @@
 import { CreateCategoryPayload, UpdateCategoryPayload } from "@/types";
-import axios from "axios";
+import { api } from "@/utils/api";
 
 export const fetchCategories = async () => {
-    const res = await axios.get(
-        "http://localhost:8000/events/categories/",
-        {
-            withCredentials: true,
-        }
-    );
+    const res = await api.get("/events/categories/");
 
     return res.data;
 }
 
 export const createCategory = async (data: CreateCategoryPayload) => {
-    const res = await axios.post(
-        "http://localhost:8000/events/categories/",
-        data,
-        {
-            withCredentials: true,
-        }
-    );
+    const res = await api.post("/events/categories/", data);
 
     return res.data;
 }
 
 export const updateCategory = async (id: number, data: UpdateCategoryPayload) => {
-    const res = await axios.patch(
-        `http://localhost:8000/events/categories/${id}/`,
-        data,
-        {
-            withCredentials: true,
-        }
-    );
+    const res = await api.patch(`/events/categories/${id}/`, data);
 
     return res.data;
 }
