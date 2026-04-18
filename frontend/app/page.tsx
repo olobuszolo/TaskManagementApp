@@ -4,6 +4,7 @@ import { loginUser, registerUser } from "../utils/auth";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [username, setUsername] = useState("");
 	const [mode, setMode] = useState<"login" | "register">("login");
@@ -14,8 +15,12 @@ export default function LoginPage() {
 
 	const handleSubmit = async (e: { preventDefault: () => void; }) => {
 		e.preventDefault();
-		if (password === "" || username === "") {
-			setErrorMessage("Please fill in username and password.");
+		if (password === "" || username === "" || (mode === "register" && email === "")) {
+			setErrorMessage(
+				mode === "register"
+					? "Please fill in username, email, and password."
+					: "Please fill in username and password.",
+			);
 			return;
 		}
 
@@ -30,9 +35,10 @@ export default function LoginPage() {
 				return;
 			}
 
-			await registerUser(username, password);
+			await registerUser(username, email, password);
 			setSuccessMessage("Account created. You can now log in.");
 			setMode("login");
+			setEmail("");
 			setPassword("");
 		} catch (e) {
 			const message = e instanceof Error ? e.message : "Something went wrong.";
@@ -110,6 +116,20 @@ export default function LoginPage() {
 							className="w-full mt-1 p-3 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
 						/>
 					</div>
+
+					{mode === "register" && (
+						<div>
+							<label className="text-sm text-slate-400">Email</label>
+							<input
+								type="email"
+								value={email}
+								autoComplete="email"
+								required
+								onChange={(e) => setEmail(e.target.value)}
+								className="w-full mt-1 p-3 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+							/>
+						</div>
+					)}
 
 					<div>
 						<label className="text-sm text-slate-400">Password</label>

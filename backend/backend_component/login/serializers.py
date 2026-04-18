@@ -5,11 +5,12 @@ from django.contrib.auth import authenticate
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'password']
+        fields = ['id', 'username', 'email', 'password']
 
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():

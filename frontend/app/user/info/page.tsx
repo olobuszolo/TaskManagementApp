@@ -1,18 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Category, UserInfo } from "@/types";
 import { fetchCurrentUser } from "@/app/services/user";
 import { createCategory, fetchCategories, updateCategory } from "@/app/services/categories";
+import { logoutUser } from "@/utils/auth";
 
 const DEFAULT_CATEGORY_COLOR = "#2563eb";
 
 export default function UserInfoPage() {
+	const router = useRouter();
 	const [user, setUser] = useState<UserInfo | null>(null);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [newCategoryName, setNewCategoryName] = useState("");
 	const [newCategoryColor, setNewCategoryColor] = useState(DEFAULT_CATEGORY_COLOR);
+	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 	useEffect(() => {
 		const loadPageData = async () => {
@@ -80,6 +84,17 @@ export default function UserInfoPage() {
 		}
 	};
 
+	const handleLogout = async () => {
+		setIsLoggingOut(true);
+		try {
+			await logoutUser();
+			router.push("/");
+		} catch (error) {
+			console.error("Logout failed:", error);
+			setIsLoggingOut(false);
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-slate-900 px-4 py-8 text-white">
 			<div className="mx-auto max-w-4xl">
@@ -96,12 +111,22 @@ export default function UserInfoPage() {
 						</p>
 					</div>
 
-					<Link
-						href="/user"
-						className="inline-flex items-center justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
-					>
-						Back to calendar
-					</Link>
+					<div className="flex gap-3">
+						<Link
+							href="/user"
+							className="inline-flex items-center justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
+						>
+							Back to calendar
+						</Link>
+						<button
+							type="button"
+							onClick={handleLogout}
+							disabled={isLoggingOut}
+							className="inline-flex items-center justify-center rounded-lg border border-red-500/40 px-4 py-2 text-sm font-medium text-red-200 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+						>
+							{isLoggingOut ? "Logging out..." : "Logout"}
+						</button>
+					</div>
 				</div>
 
 				<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">

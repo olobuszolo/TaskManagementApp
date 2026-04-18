@@ -14,6 +14,10 @@ const extractErrorMessage = (error: unknown, fallbackMessage: string) => {
             return data.username[0];
         }
 
+        if (Array.isArray(data?.email) && typeof data.email[0] === "string") {
+            return data.email[0];
+        }
+
         if (Array.isArray(data?.non_field_errors) && typeof data.non_field_errors[0] === "string") {
             return data.non_field_errors[0];
         }
@@ -34,10 +38,11 @@ export const loginUser = async (username: string, password: string) => {
     }
 }
 
-export const registerUser = async (username: string, password: string) => {
+export const registerUser = async (username: string, email: string, password: string) => {
     try {
         const response = await axios.post(`${API_URL}/login/user/register/`, {
             username,
+            email,
             password
         });
         return response.data;

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Category, Event, Status } from "../../types";
 import { createEvent, fetchEvents, deleteEvent } from "../services/events";
 import CalendarViewModel from "./components/CalendarView"; 
@@ -12,6 +13,7 @@ import AddEventModal from "./components/AddEventModal";
 import EventFiltersPanel from "./components/EventFiltersPanel";
 import { fetchCategories } from "../services/categories";
 import { fetchStatuses } from "../services/statuses";
+import { logoutUser } from "@/utils/auth";
 
 const getCurrentVisibleMonth = () => {
 	const now = new Date();
@@ -22,6 +24,7 @@ const getCurrentVisibleMonth = () => {
 };
 
 export default function UserPage() {
+	const router = useRouter();
 	const [events, setEvents] = useState<Event[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [statuses, setStatuses] = useState<Status[]>([]);
@@ -41,6 +44,7 @@ export default function UserPage() {
 	const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 	useEffect(() => {
 		const loadCategories = async () => {
@@ -166,16 +170,35 @@ export default function UserPage() {
 		}))
 	}
 
+	const handleLogout = async () => {
+		setIsLoggingOut(true);
+		try {
+			await logoutUser();
+			router.push("/");
+		} catch (error) {
+			console.error("Logout failed:", error);
+			setIsLoggingOut(false);
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-slate-900 text-white">
 			<div className="relative max-w-4xl mx-auto p-4">
-				<div className="mb-4 flex justify-end">
+				<div className="mb-4 flex justify-end gap-3">
 					<Link
 						href="/user/info"
 						className="inline-flex items-center justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
 					>
 						User info
 					</Link>
+					<button
+						type="button"
+						onClick={handleLogout}
+						disabled={isLoggingOut}
+						className="inline-flex items-center justify-center rounded-lg border border-red-500/40 px-4 py-2 text-sm font-medium text-red-200 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+					>
+						{isLoggingOut ? "Logging out..." : "Logout"}
+					</button>
 				</div>
 
 				<EventFiltersPanel
