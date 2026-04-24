@@ -1,6 +1,8 @@
 import { CreateCategoryPayload, UpdateCategoryPayload } from "@/types";
 import { api } from "@/utils/api";
 
+"This module provides functions to interact with the categories API endpoints, including fetching all categories, creating a new category, and updating an existing category."
+
 export const fetchCategories = async () => {
     const res = await api.get("/events/categories/");
 

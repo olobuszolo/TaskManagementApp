@@ -13,6 +13,7 @@ export default function LoginPage() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const router = useRouter();
 
+	// Handle form submission for both login and registration
 	const handleSubmit = async (e: { preventDefault: () => void; }) => {
 		e.preventDefault();
 		if (password === "" || username === "" || (mode === "register" && email === "")) {
@@ -41,7 +42,7 @@ export default function LoginPage() {
 			setEmail("");
 			setPassword("");
 		} catch (e) {
-			const message = e instanceof Error ? e.message : "Something went wrong.";
+			const message = e instanceof Error ? e.message : "Something went wrong!!!";
 			setErrorMessage(message);
 			console.error(`${mode} failed:`, e);
 		} finally {

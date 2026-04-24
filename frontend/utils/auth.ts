@@ -1,6 +1,8 @@
 import axios from "axios";
 import { api } from "./api";
 
+"This module provides utility functions for user authentication, including login, registration, logout, fetching user info, and refreshing tokens."
+
 const extractErrorMessage = (error: unknown, fallbackMessage: string) => {
     if (axios.isAxiosError(error)) {
         const data = error.response?.data;

@@ -2,6 +2,8 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 const API_URL = "http://localhost:8000";
 
+"This module sets up an Axios instance with a response interceptor to handle token refresh logic. When a 401 Unauthorized error is encountered, it attempts to refresh the access token using a single shared promise to prevent multiple simultaneous refresh requests. If the refresh is successful, it retries the original request. If the refresh fails or if the original request was for login or token refresh endpoints, it rejects the error."
+
 type RetriableRequestConfig = InternalAxiosRequestConfig & {
 	_retry?: boolean;
 };
