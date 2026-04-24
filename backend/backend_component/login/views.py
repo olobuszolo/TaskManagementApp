@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics, status
 from .serializers import UserSerializer, LoginUserSerializer
@@ -54,8 +53,8 @@ class LogoutView(APIView):
             try:
                 refresh = RefreshToken(refresh_token)
                 refresh.blacklist()
-            except Exception as e:
-                return Response({'error': 'Invalid refresh token' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception:
+                pass
             
         response = Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
         response.delete_cookie('access_token')

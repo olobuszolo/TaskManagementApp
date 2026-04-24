@@ -1,12 +1,7 @@
-import axios from "axios";
+import { api } from "@/utils/api";
 
 export const fetchCurrentUser = async () => {
-    const res = await axios.get(
-        "http://localhost:8000/login/user-info/",
-        {
-            withCredentials: true,
-        }
-    );
+    const res = await api.get("/login/user-info/");
 
     return res.data;
 }
