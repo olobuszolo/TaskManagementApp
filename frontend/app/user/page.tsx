@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Category, Event, Status } from "../../types";
+import { Category, CreateEventData, Event, RecurrenceFrequency, Status } from "../../types";
 import { createEvent, fetchEvents, deleteEvent } from "../services/events";
 import CalendarViewModel from "./components/CalendarView"; 
 import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
@@ -34,12 +34,16 @@ export default function UserPage() {
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [addEventModal, setAddEventModal] = useState(false);
-	const [newEvent, setNewEvent] = useState({
+	const [newEvent, setNewEvent] = useState<CreateEventData>({
 		title: "",
 		description: "",
 		scheduled_for: selectedDate,
 		category_id: null,
 		status_id: null,
+		is_recurring: false,
+		recurrence_frequency: "daily" as const,
+		recurrence_interval: 1,
+		recurrence_end_date: null,
 	})
 	const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -104,10 +108,58 @@ export default function UserPage() {
 
 	const handleChangeNewEvent = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
 		const { name, value } = e.target;
-		setNewEvent((prev) => ({
-			...prev,
-			[name]: name === "category_id" || name === "status_id" ? (value ? parseInt(value) : null) : value,
-		}))
+		const checked = e.target instanceof HTMLInputElement ? e.target.checked : false;
+
+		setNewEvent((prev) => {
+			if (name === "is_recurring") {
+				return {
+					...prev,
+					is_recurring: checked,
+					recurrence_frequency: checked ? prev.recurrence_frequency ?? "daily" : "daily",
+					recurrence_interval: checked ? prev.recurrence_interval : 1,
+					recurrence_end_date: checked
+						? prev.recurrence_end_date ?? prev.scheduled_for?.slice(0, 10) ?? null
+						: null,
+				};
+			}
+
+			if (name === "category_id" || name === "status_id") {
+				return {
+					...prev,
+					[name]: value ? parseInt(value, 10) : null,
+				};
+			}
+
+			if (name === "recurrence_interval") {
+				return {
+					...prev,
+					recurrence_interval: Math.max(1, parseInt(value, 10) || 1),
+				};
+			}
+
+			if (name === "recurrence_frequency") {
+				return {
+					...prev,
+					recurrence_frequency: value as RecurrenceFrequency,
+				};
+			}
+
+			if (name === "recurrence_end_date") {
+				return {
+					...prev,
+					recurrence_end_date: value || null,
+				};
+			}
+
+			if (name === "title" || name === "description" || name === "scheduled_for") {
+				return {
+					...prev,
+					[name]: value,
+				};
+			}
+
+			return prev;
+		})
 	}
 
 	const getRoundedDateTime = (date: string) => {
@@ -142,6 +194,10 @@ export default function UserPage() {
 				scheduled_for: "",
 				category_id: null,
 				status_id: null,
+				is_recurring: false,
+				recurrence_frequency: "daily",
+				recurrence_interval: 1,
+				recurrence_end_date: null,
 			});
 		} catch (error) {
 			console.error("Error adding event:", error);
@@ -257,6 +313,10 @@ export default function UserPage() {
 								scheduled_for: "",
 								category_id: null,
 								status_id: null,
+								is_recurring: false,
+								recurrence_frequency: "daily",
+								recurrence_interval: 1,
+								recurrence_end_date: null,
 							});
 						}}
 						onSubmit={handleAddEvent}

@@ -17,13 +17,32 @@ class Status(models.Model):
     name = models.CharField(max_length=50, unique=True)
     color = models.CharField(max_length=7, default='#000000', null=True, blank=True)  
 
-class Events(models.Model):
+class RecurringEvents(models.Model):
+    class RecurrenceFrequency(models.TextChoices):
+        DAILY = 'daily', 'Every day'
+        WEEKLY = 'weekly', 'Every week'
+        MONTHLY = 'monthly', 'Every month'
+        YEARLY = 'yearly', 'Every year'
 
+    creator_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recurring_events')
+    frequency = models.CharField(max_length=10, choices=RecurrenceFrequency.choices)
+    interval = models.PositiveIntegerField(default=1)
+    end_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Events(models.Model):
     class EventStatus(models.TextChoices):
         NOT_APPLICABLE = 'not_applicable', 'Not Applicable'
         TODO = 'todo', 'To Do'
         IN_PROGRESS = 'in_progress', 'In Progress'
         DONE = 'done', 'Done'
+
+    class RecurrenceFrequency(models.TextChoices):
+        DAILY = 'daily', 'Every day'
+        WEEKLY = 'weekly', 'Every week'
+        MONTHLY = 'monthly', 'Every month'
+        YEARLY = 'yearly', 'Every year'
 
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -33,6 +52,22 @@ class Events(models.Model):
     category_id = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True, related_name='events')
     status_id = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True, related_name='events')
     group_id = models.IntegerField(null=True, blank=True)
+    recurrence_series_id = models.ForeignKey(
+        RecurringEvents,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='events',
+    )
+    is_recurring = models.BooleanField(default=False)
+    recurrence_frequency = models.CharField(
+        max_length=10,
+        choices=RecurrenceFrequency.choices,
+        null=True,
+        blank=True,
+    )
+    recurrence_interval = models.PositiveIntegerField(default=1)
+    recurrence_end_date = models.DateField(null=True, blank=True)
 
 class EventParticipants(models.Model):
     event_id = models.ForeignKey(Events, on_delete=models.CASCADE, related_name='participants')
