@@ -9,6 +9,22 @@ from datetime import datetime, timedelta
 import calendar
 
 
+DEFAULT_STATUSES = [
+    ("not_applicable", "Not Applicable"),
+    ("todo", "To Do"),
+    ("in_progress", "In Progress"),
+    ("done", "Done"),
+]
+
+
+def create_default_statuses():
+    if Status.objects.exists():
+        return
+
+    for code, name in DEFAULT_STATUSES:
+        Status.objects.create(code=code, name=name)
+
+
 def get_month_bounds(year, month):
     month_start = datetime(year, month, 1).date()
     if month == 12:
@@ -70,6 +86,10 @@ class StatusListView(generics.ListAPIView):
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        create_default_statuses()
+        return Status.objects.order_by("id")
 
 class EventListCreateView(generics.ListCreateAPIView):
     queryset = Events.objects.all()
