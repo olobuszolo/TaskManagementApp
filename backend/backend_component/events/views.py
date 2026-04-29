@@ -82,7 +82,7 @@ class CategoryDetailView(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         return Categories.objects.filter(owner_id=self.request.user)
 
-class StatusListView(generics.ListAPIView):
+class StatusListView(generics.ListCreateAPIView):
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
     permission_classes = [IsAuthenticated]
@@ -137,7 +137,7 @@ class EventListCreateView(generics.ListCreateAPIView):
 
         if not event.is_recurring:
             return
-
+        # For recurring events, we create the entire series upfront to simplify retrieval and management.
         recurrence_series = RecurringEvents.objects.create(
             creator_id=self.request.user,
             frequency=event.recurrence_frequency,

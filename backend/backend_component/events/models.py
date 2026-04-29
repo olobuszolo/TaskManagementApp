@@ -16,6 +16,7 @@ class Status(models.Model):
     code = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=50, unique=True)
     color = models.CharField(max_length=7, default='#000000', null=True, blank=True)  
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class RecurringEvents(models.Model):
     class RecurrenceFrequency(models.TextChoices):
@@ -32,12 +33,14 @@ class RecurringEvents(models.Model):
 
 
 class Events(models.Model):
+    # Enum defining available statuses for an event (local to Events model for clarity and encapsulation)
     class EventStatus(models.TextChoices):
         NOT_APPLICABLE = 'not_applicable', 'Not Applicable'
         TODO = 'todo', 'To Do'
         IN_PROGRESS = 'in_progress', 'In Progress'
         DONE = 'done', 'Done'
 
+    # Enum defining recurrence frequency options used specifically by the Events model
     class RecurrenceFrequency(models.TextChoices):
         DAILY = 'daily', 'Every day'
         WEEKLY = 'weekly', 'Every week'

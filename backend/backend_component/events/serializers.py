@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Categories, Events, EventParticipants, RecurringEvents, Status
+from django.utils.text import slugify
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,7 +13,27 @@ class CategorySerializer(serializers.ModelSerializer):
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
-        fields = ['id', 'code', 'name', 'color']
+        fields = ['id', 'name', 'created_at']
+        extra_kwargs = {
+            'created_at': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        name = validated_data['name']
+        base_code = slugify(name).replace('-', '_') or 'status'
+        code = base_code[:50]
+        suffix = 2
+
+        while Status.objects.filter(code=code).exists():
+            suffix_text = f"_{suffix}"
+            code = f"{base_code[:50 - len(suffix_text)]}{suffix_text}"
+            suffix += 1
+
+        return Status.objects.create(
+            code=code,
+            name=name,
+            color=None,
+        )
 
 class RecurringEventSerializer(serializers.ModelSerializer):
     class Meta:

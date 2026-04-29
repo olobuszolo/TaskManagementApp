@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import status as http_status
 from rest_framework.test import APITestCase
 
-from .models import Categories, Events, EventParticipants, RecurringEvents, Status
+from .models import Categories, Events, EventParticipants, RecurringEvents
 
 
 class EventsApiTests(APITestCase):
@@ -14,7 +14,7 @@ class EventsApiTests(APITestCase):
         )
         self.client.force_authenticate(user=self.user)
 
-    # Sprawdza, czy utworzenie wydarzenia cyklicznego tworzy osobne rekordy dla kazdego wystapienia.
+    # Verifies that creating a recurring event creates separate rows for each occurrence.
     def test_creating_recurring_event_creates_independent_event_rows(self):
         # Arrange
         payload = {
@@ -54,7 +54,7 @@ class EventsApiTests(APITestCase):
             1,
         )
 
-    # Sprawdza, czy usuniecie jednego wystapienia wydarzenia cyklicznego usuwa cala serie.
+    # Verifies that deleting one recurring event occurrence deletes the whole series.
     def test_deleting_one_occurrence_deletes_whole_recurring_series(self):
         # Arrange
         self.client.post(
@@ -98,7 +98,7 @@ class CategoriesApiTests(APITestCase):
         )
         self.client.force_authenticate(user=self.user)
 
-    # Sprawdza, czy lista kategorii zwraca tylko kategorie zalogowanego uzytkownika.
+    # Verifies that the category list returns only the current user's categories.
     def test_category_list_returns_only_current_user_categories(self):
         # Arrange
         own_category = Categories.objects.create(owner_id=self.user, name="Work", color="#2563eb")
@@ -111,7 +111,7 @@ class CategoriesApiTests(APITestCase):
         self.assertEqual(response.status_code, http_status.HTTP_200_OK)
         self.assertEqual([category["id"] for category in response.data], [own_category.id])
 
-    # Sprawdza, czy tworzenie kategorii automatycznie przypisuje ja do zalogowanego uzytkownika.
+    # Verifies that creating a category automatically assigns it to the current user.
     def test_creating_category_assigns_current_user_as_owner(self):
         # Arrange
         payload = {
@@ -138,10 +138,10 @@ class StatusesApiTests(APITestCase):
         )
         self.client.force_authenticate(user=self.user)
 
-    # Sprawdza, czy endpoint statusow zwraca dostepne statusy wydarzen.
+    # Verifies that the statuses endpoint returns the available event statuses.
     def test_status_list_returns_available_statuses(self):
         # Arrange
-        statuses = list(Status.objects.order_by("id"))
+        expected_status_names = ["Not Applicable", "To Do", "In Progress", "Done"]
 
         # Act
         response = self.client.get("/events/statuses/")
@@ -149,6 +149,6 @@ class StatusesApiTests(APITestCase):
         # Assert
         self.assertEqual(response.status_code, http_status.HTTP_200_OK)
         self.assertEqual(
-            [item["id"] for item in response.data],
-            [status.id for status in statuses],
+            [item["name"] for item in response.data],
+            expected_status_names,
         )

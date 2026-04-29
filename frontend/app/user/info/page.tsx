@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Category, UserInfo } from "@/types";
+import { Category, Status, UserInfo } from "@/types";
 import { fetchCurrentUser } from "@/app/services/user";
 import { createCategory, fetchCategories, updateCategory } from "@/app/services/categories";
+import { createStatus, fetchStatuses } from "@/app/services/statuses";
 import { logoutUser } from "@/utils/auth";
 
 const DEFAULT_CATEGORY_COLOR = "#2563eb";
@@ -14,20 +15,24 @@ export default function UserInfoPage() {
 	const router = useRouter();
 	const [user, setUser] = useState<UserInfo | null>(null);
 	const [categories, setCategories] = useState<Category[]>([]);
+	const [statuses, setStatuses] = useState<Status[]>([]);
 	const [newCategoryName, setNewCategoryName] = useState("");
 	const [newCategoryColor, setNewCategoryColor] = useState(DEFAULT_CATEGORY_COLOR);
+	const [newStatusName, setNewStatusName] = useState("");
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 	useEffect(() => {
 		const loadPageData = async () => {
 			try {
-				const [userData, categoriesData] = await Promise.all([
+				const [userData, categoriesData, statusesData] = await Promise.all([
 					fetchCurrentUser(),
 					fetchCategories(),
+					fetchStatuses(),
 				]);
 
 				setUser(userData);
 				setCategories(categoriesData);
+				setStatuses(statusesData);
 			} catch (error) {
 				console.error("Failed to load user info page:", error);
 			}
@@ -84,6 +89,26 @@ export default function UserInfoPage() {
 		}
 	};
 
+	const handleCreateStatus = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		const trimmedName = newStatusName.trim();
+		if (!trimmedName) {
+			return;
+		}
+
+		try {
+			await createStatus({
+				name: trimmedName,
+			});
+			const statusesData = await fetchStatuses();
+			setStatuses(statusesData);
+			setNewStatusName("");
+		} catch (error) {
+			console.error("Failed to create status:", error);
+		}
+	};
+
 	const handleLogout = async () => {
 		setIsLoggingOut(true);
 		try {
@@ -107,7 +132,7 @@ export default function UserInfoPage() {
 							User information
 						</h1>
 						<p className="mt-2 text-sm text-slate-400">
-							Manage your account details and personal event categories
+							Manage your account details, event categories, and statuses
 						</p>
 					</div>
 
@@ -239,6 +264,56 @@ export default function UserInfoPage() {
 									))}
 								</ul>
 							)}
+						</div>
+
+						<div className="mt-8 border-t border-slate-800 pt-6">
+							<h2 className="text-xl font-semibold text-white">Your statuses</h2>
+							<p className="mt-2 text-sm text-slate-400">
+								Here you can create custom statuses for your events.
+							</p>
+
+							<form onSubmit={handleCreateStatus} className="mt-5 space-y-3">
+								<div>
+									<label htmlFor="status-name" className="text-sm font-medium text-slate-300">
+										New status
+									</label>
+									<input
+										id="status-name"
+										type="text"
+										value={newStatusName}
+										onChange={(e) => setNewStatusName(e.target.value)}
+										placeholder="e.g. Waiting, Blocked, Done"
+										className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-sm text-white outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+									/>
+								</div>
+
+								<button
+									type="submit"
+									className="w-full rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+								>
+									Add status
+								</button>
+							</form>
+
+							<div className="mt-5">
+								<p className="text-sm font-medium text-slate-300">Saved statuses</p>
+								{statuses.length === 0 ? (
+									<p className="mt-3 text-sm text-slate-500">
+										No statuses yet. Add your first one above.
+									</p>
+								) : (
+									<ul className="mt-3 space-y-2">
+										{statuses.map((status) => (
+											<li
+												key={status.id}
+												className="rounded-xl border border-slate-800 bg-slate-900/80 px-3 py-3 text-sm font-medium text-slate-200"
+											>
+												{status.name}
+											</li>
+										))}
+									</ul>
+								)}
+							</div>
 						</div>
 					</section>
 				</div>

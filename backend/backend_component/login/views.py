@@ -12,6 +12,7 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    authentication_classes = []
     permission_classes = [AllowAny]
 
 class UserDetailView(generics.RetrieveAPIView):
@@ -23,6 +24,9 @@ class UserDetailView(generics.RetrieveAPIView):
         return self.request.user
     
 class LoginView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = LoginUserSerializer(data=request.data)
 
@@ -47,6 +51,9 @@ class LoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class LogoutView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
     def post(self, request):
         refresh_token = request.COOKIES.get('refresh_token')
         if refresh_token:
@@ -63,6 +70,9 @@ class LogoutView(APIView):
         return response
     
 class CookieTokenRefreshView(TokenRefreshView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
     def post(self, request):
         refresh_token = request.COOKIES.get('refresh_token')
         if not refresh_token:
@@ -77,4 +87,7 @@ class CookieTokenRefreshView(TokenRefreshView):
             )
             return response
         except InvalidToken:
-            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+            response = Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+            response.delete_cookie('access_token')
+            response.delete_cookie('refresh_token')
+            return response

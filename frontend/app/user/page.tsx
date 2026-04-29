@@ -257,6 +257,8 @@ export default function UserPage() {
 					</button>
 				</div>
 
+				{/* Main content area with calendar and filters */}
+				{/* Filter Panel */}
 				<EventFiltersPanel
 					categories={categories}
 					statuses={statuses}
@@ -272,6 +274,7 @@ export default function UserPage() {
 					}}
 				/>
 
+				{/* Calendar View */}
 				<CalendarViewModel 
 					events={filteredEvents}
 					categories={categories}
@@ -286,6 +289,7 @@ export default function UserPage() {
 					}}
 				/>
 
+				{/* Modal for displaying events on a specific day */}
 				{isModalOpen && selectedDate && (
 					<DayEventsModal
 						selectedDate={selectedDate}
@@ -300,6 +304,7 @@ export default function UserPage() {
 					/>
 				)}
 
+				{/* Modal for adding new events */}
 				{addEventModal && (
 					<AddEventModal
 						newEvent={newEvent}
@@ -323,6 +328,7 @@ export default function UserPage() {
 					/>
 				)}
 
+				{/* Event Details Modal */}
 				{isEventModalOpen && selectedEvent &&  (
 					<EventDetailsModal
 						event={selectedEvent}
@@ -336,6 +342,7 @@ export default function UserPage() {
 					/>
 				)}
 
+				{/* Confirm Delete Modal */}
 				{deleteModalOpen && selectedEvent && (
 					<ConfirmDeleteModal
 						title={selectedEvent.title}

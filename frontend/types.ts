@@ -23,9 +23,8 @@ export type Category = {
 
 export type Status = {
     id: number;
-    code: string;
     name: string;
-    color: string;
+    created_at: string;
 }
 
 export type UserInfo = {
@@ -127,6 +126,10 @@ export type CreateEventData = NewEventType;
 export type CreateCategoryPayload = {
     name: string;
     color: string;
+}
+
+export type CreateStatusPayload = {
+    name: string;
 }
 
 export type UpdateCategoryPayload = {
