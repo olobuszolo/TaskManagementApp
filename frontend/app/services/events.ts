@@ -1,9 +1,9 @@
-import { Event, UpdateEventData } from "../../types";
+import { CreateEventData, UpdateEventData } from "../../types";
 import { api } from "@/utils/api";
 
 "This module provides functions to interact with the events API endpoints, including creating, fetching, updating, and deleting events."
 
-export const createEvent = async (data: Event) => {
+export const createEvent = async (data: CreateEventData) => {
 	const res = await api.post("/events/", data);
 
 	return res.data;

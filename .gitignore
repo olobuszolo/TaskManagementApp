@@ -11,6 +11,14 @@ env/
 
 # Django / backend generated files
 backend/backend_component/*/migrations/[0-9]*.py
+!backend/backend_component/events/migrations/0001_initial.py
+!backend/backend_component/events/migrations/0002_alter_events_description_alter_events_status.py
+!backend/backend_component/events/migrations/0003_alter_events_status.py
+!backend/backend_component/events/migrations/0004_status_remove_events_status_events_status_id.py
+!backend/backend_component/events/migrations/0005_categories_color.py
+!backend/backend_component/events/migrations/0006_events_recurrence.py
+!backend/backend_component/events/migrations/0007_recurringevents_recurrence_series.py
+!backend/backend_component/events/migrations/0008_status_created_at.py
 backend/backend_component/*/migrations/*.pyc
 db.sqlite3
 

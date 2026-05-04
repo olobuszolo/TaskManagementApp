@@ -2,6 +2,13 @@ import Link from "next/link";
 import Modal from "./Modal";
 import { EventDetailsModalProps } from "@/types";
 
+const recurrenceLabels = {
+    daily: "day",
+    weekly: "week",
+    monthly: "month",
+    yearly: "year",
+};
+
 export default function EventDetailsModal({event, categories, statuses, onClose, onDelete}: EventDetailsModalProps) {
     return (
         <Modal onClose={onClose}>
@@ -23,6 +30,17 @@ export default function EventDetailsModal({event, categories, statuses, onClose,
             <p className="text-slate-700 mb-2">
                 {event.scheduled_for || "No date provided."}
             </p>
+            {event.is_recurring && event.recurrence_frequency && (
+                <>
+                    <p className="text-xs text-slate-500 font-semibold uppercase">
+                        Recurrence
+                    </p>
+                    <p className="text-slate-700 mb-2">
+                        Every {event.recurrence_interval} {recurrenceLabels[event.recurrence_frequency]}
+                        {event.recurrence_interval === 1 ? "" : "s"} until {event.recurrence_end_date}
+                    </p>
+                </>
+            )}
             <p className="text-xs text-slate-500 font-semibold uppercase">
                 Category
             </p>

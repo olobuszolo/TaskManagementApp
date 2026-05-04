@@ -8,6 +8,11 @@ export type Event = {
     category_id: number | null;
     status_id: number | null;
     group_id: number | null;
+    recurrence_series_id: number | null;
+    is_recurring: boolean;
+    recurrence_frequency: RecurrenceFrequency | null;
+    recurrence_interval: number;
+    recurrence_end_date: string | null;
 }
 
 export type Category = {
@@ -18,9 +23,8 @@ export type Category = {
 
 export type Status = {
     id: number;
-    code: string;
     name: string;
-    color: string;
+    created_at: string;
 }
 
 export type UserInfo = {
@@ -67,12 +71,18 @@ export type DayEventsModalProps = {
     onSelectedEvent: (event: Event) => void;
 }
 
+export type RecurrenceFrequency = "daily" | "weekly" | "monthly" | "yearly";
+
 type NewEventType = {
     title: string;
     description: string;
     scheduled_for: string | null;
     category_id: number | null;
     status_id: number | null;
+    is_recurring: boolean;
+    recurrence_frequency: RecurrenceFrequency | null;
+    recurrence_interval: number;
+    recurrence_end_date: string | null;
 }
 
 export type AddEventModalProps = {
@@ -105,11 +115,21 @@ export type UpdateEventData = {
     scheduled_for: string
     category_id: number | null;
     status_id: number | null;
+    is_recurring?: boolean;
+    recurrence_frequency?: RecurrenceFrequency | null;
+    recurrence_interval?: number;
+    recurrence_end_date?: string | null;
 }
+
+export type CreateEventData = NewEventType;
 
 export type CreateCategoryPayload = {
     name: string;
     color: string;
+}
+
+export type CreateStatusPayload = {
+    name: string;
 }
 
 export type UpdateCategoryPayload = {
